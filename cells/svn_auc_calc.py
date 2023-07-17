@@ -60,7 +60,7 @@ class Svd_AUC:
 
         return cum_var_x, cum_var_y
 
-    def place_grid_cells_SVDs(self, area_name):
+    def place_grid_cells_SVDs(self, area_name, trials=np.empty(2)):
 
         """
         Performs Singular Value Decomposition (SVD) analysis on place grid cell data.
@@ -107,13 +107,23 @@ class Svd_AUC:
 
         return between_left, within_left, between_right, within_right
 
-
-    def cal_auc(self):
+    def cal_auc_real(self):
         between_left_grid, within_left_grid, between_right_grid, within_right_grid = self.place_grid_cells_SVDs('grid')
         between_left_place, within_left_place, between_right_grid, within_right_place= self.place_grid_cells_SVDs('place')
         auc_dif_grid = np.sum(within_left_grid - between_left_grid)
         auc_dif_place = np.sum(within_left_place - between_left_place)
         print(auc_dif_grid, auc_dif_place)
+
+    def cal_auc_permuted(self, permuted_data):
+        between_left, within_left, between_right, within_right = self.place_grid_cells_SVDs(
+            'permuted', permuted_data)
+        auc_dif = np.sum(within_left - between_left)
+        return auc_dif
+
+    def cal_auc_permuted_vec(self):
+        auc_dif_list = [self.cal_auc_permuted(np.squeeze(self.permuted_data[x, :, :, :])) for x in np.arange(self.permuted_data.shape[0])]
+        auc_dif_vec = np.array(auc_dif_list)
+        return auc_dif_vec
 
     def permute_data(self, num_samples=10):
         array1 = self.place_cells

@@ -131,10 +131,12 @@ if __name__ == '__main__':
     print(f"place cells array shape {place_cells.shape}")
     print(f"grid cells array shape {grid_cells.shape}")
     Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells)
-    #Svd_AUC_obj.cal_auc()
+    #Svd_AUC_obj.cal_auc_real()
     Svd_AUC_obj.permute_data(num_samples=10)
     sampled_rows = Svd_AUC_obj.permuted_data
     print(sampled_rows.shape)
+    auc_permuted = Svd_AUC_obj.cal_auc_permuted_vec()
+    print(auc_permuted)
 
 
 
