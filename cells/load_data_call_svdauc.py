@@ -6,6 +6,7 @@ import os.path
 from scipy import interpolate
 from scipy.ndimage import gaussian_filter
 
+from svn_auc_calc import Svd_AUC
 DATA_PATH = 'grid_and_place_cells\\grid_and_place_cells'
 
 
@@ -122,7 +123,18 @@ def run():
 
     return place_cells, grid_cells
 
+def my_func(a):
+    print(a.shape)
+
 if __name__ == '__main__':
     place_cells, grid_cells = run()
     print(f"place cells array shape {place_cells.shape}")
     print(f"grid cells array shape {grid_cells.shape}")
+    Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells)
+    #Svd_AUC_obj.cal_auc()
+    Svd_AUC_obj.permute_data(num_samples=10)
+    sampled_rows = Svd_AUC_obj.permuted_data
+    print(sampled_rows.shape)
+
+
+
