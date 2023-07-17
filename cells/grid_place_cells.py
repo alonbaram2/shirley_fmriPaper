@@ -2,10 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.io
+import os.path
 from scipy import interpolate
 from scipy.ndimage import gaussian_filter
 
-DATA_PATH = '/Users/veronikasamborska/Desktop/grid_and_place_cells/'
+DATA_PATH = 'grid_and_place_cells\\grid_and_place_cells'
 
 def interpolate_and_filter_cells(trials):
     """
@@ -144,7 +145,9 @@ def place_grid_cells_SVDs(file, dictionary, color='green'):
     each subsequent trial, it calculates the cumulative variances using the left and right singular vectors 
     obtained from the first trial's SVD. The cumulative variances for each trial are then returned.
     """
-    load_cells = scipy.io.loadmat(DATA_PATH + file)
+    print(os.getcwd())
+    print(os.path.join(DATA_PATH, file))
+    load_cells = scipy.io.loadmat(os.path.join(os.getcwd(), DATA_PATH, file))
     
     #
     # Note that below I just selected the first 41 cells  to make grid and place cell area under the curve comparable (as this is the total number of grid cells but there are more place cells in the data). 
@@ -188,6 +191,7 @@ def plot_cumulative_variances(cum_var_within, cum_var_between, sub = 1, color='g
     plt.ylabel('% Variance Explained')
     sns.despine()
     plt.title(title)
+
  
 
 
@@ -214,3 +218,4 @@ def run():
         
 if __name__ == '__main__':
     run()
+    plt.show()
