@@ -5,6 +5,7 @@ import scipy.io
 import os.path
 from scipy import interpolate
 from scipy.ndimage import gaussian_filter
+import os
 
 from svn_auc_calc import Svd_AUC
 DATA_PATH = 'grid_and_place_cells\\grid_and_place_cells'
@@ -101,7 +102,7 @@ def data_preprocessing(file, dictionary, color='green'):
     #
 
     extract_cells = load_cells[dictionary][:41]
-
+    print(extract_cells.shape)
     trials = [interpolate_and_filter_cells(extract_cells[:, i]) for i in range(5)]
 
     mean = np.mean(np.concatenate(trials, axis=1), axis=1)
@@ -130,13 +131,24 @@ if __name__ == '__main__':
     place_cells, grid_cells = run()
     print(f"place cells array shape {place_cells.shape}")
     print(f"grid cells array shape {grid_cells.shape}")
-    Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells)
-    #Svd_AUC_obj.cal_auc_real()
-    Svd_AUC_obj.permute_data(num_samples=10)
-    sampled_rows = Svd_AUC_obj.permuted_data
-    print(sampled_rows.shape)
-    auc_permuted = Svd_AUC_obj.cal_auc_permuted_vec()
-    print(auc_permuted)
+
+    if os.path.exists('grid_place_permute_auc.npy'):
+        print('auc permutation file exists')
+        permuted_gp_auc = np.load('grid_place_permute_auc.npy')
+        Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells, permuted_gp_auc=permuted_gp_auc)
+    else:
+        Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells)
+        Svd_AUC_obj.permute_grid_place_data(num_samples=1000)
+        sampled_gp = Svd_AUC_obj.permuted_gp_data
+        np.save('grid_place_permuted', sampled_gp)
+        print(sampled_gp.shape)
+        Svd_AUC_obj.cal_auc_permuted_vec(name_permutation='grid_place')
+        np.save('grid_place_permute_auc', Svd_AUC_obj.permuted_gp_auc)
+    # Svd_AUC_obj.cal_auc_real()
+    x, cdf = Svd_AUC_obj.create_permuted_auc_dist()
+    plt.plot(x, cdf)
+    plt.show()
+
 
 
 

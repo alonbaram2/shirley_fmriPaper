@@ -5,11 +5,18 @@ from scipy import interpolate
 from scipy.ndimage import gaussian_filter
 
 class Svd_AUC:
-    def __init__(self, grid_cells=np.empty(2), place_cells=np.empty(2), num_permutations=10):
+    def __init__(self, grid_cells=np.empty(2), place_cells=np.empty(2), permuted_gp_auc=np.empty(2)):
         self.grid_cells = grid_cells[:, :40, :]
         self.place_cells = place_cells
-        self.num_per = num_permutations
-        self.permuted_data = np.empty((self.num_per,) + self.grid_cells.shape)
+        self.permuted_gp_data = np.empty(self.grid_cells.shape)
+        self.permuted_p_data = np.empty( self.grid_cells.shape)
+        self.permuted_gp_auc = permuted_gp_auc
+        self.permuted_p_auc = np.empty(2)
+    """
+    permuted_gp_data - permute grid and place cells
+    permuted_p_data - sample place cells
+    
+    """
     def svd_analysis(self, data):
         """
         Performs Singular Value Decomposition (SVD) analysis on the given data.
@@ -63,24 +70,20 @@ class Svd_AUC:
     def place_grid_cells_SVDs(self, area_name, trials=np.empty(2)):
 
         """
-        Performs Singular Value Decomposition (SVD) analysis on place grid cell data.
 
         Parameters:
-        file (str): The filename containing the place grid cell data.
-        dictionary (str): The dictionary key to retrieve the place grid cell data from the .mat file.
-        color (str, optional): The color to use for plotting. Default is 'green'.
+        area_name (str): whether to calculate the svd analysis over grid/place cells/permuted data
+        trials(np.array): if not empty it should be the permuted data
 
         Returns:
         tuple: A tuple (cum_var_left, cum_var_right), where cum_var_left and cum_var_right are lists of cumulative
                variances for left and right singular vectors for each trial.
 
-        The function loads the .mat file, and for each trial, it first interpolates and filters the place cells,
-        then applies SVD and manipulates the data. It then performs the SVD analysis for the first trial, and for
+        Performs Singular Value Decomposition (SVD) analysis on place grid cell data.
+        It then performs the SVD analysis for the first trial, and for
         each subsequent trial, it calculates the cumulative variances using the left and right singular vectors
         obtained from the first trial's SVD. The cumulative variances for each trial are then returned.
         """
-        print(os.getcwd())
-
         #
         # Note that below I just selected the first 41 cells  to make grid and place cell area under the curve comparable (as this is the total number of grid cells but there are more place cells in the data).
         # This is not ideal, we should do some shuffling instead.
@@ -108,6 +111,9 @@ class Svd_AUC:
         return between_left, within_left, between_right, within_right
 
     def cal_auc_real(self):
+        """
+        This function calculate grid and place cells auc over the real data
+        """
         between_left_grid, within_left_grid, between_right_grid, within_right_grid = self.place_grid_cells_SVDs('grid')
         between_left_place, within_left_place, between_right_grid, within_right_place= self.place_grid_cells_SVDs('place')
         auc_dif_grid = np.sum(within_left_grid - between_left_grid)
@@ -115,17 +121,57 @@ class Svd_AUC:
         print(auc_dif_grid, auc_dif_place)
 
     def cal_auc_permuted(self, permuted_data):
+        """
+        This function calculate the auc of the permuted data
+
+        Parameters:
+            permuted_data (np.array): the permuted data to use for the dif-auc calculation
+
+        Return: The auc difference
+        """
         between_left, within_left, between_right, within_right = self.place_grid_cells_SVDs(
             'permuted', permuted_data)
         auc_dif = np.sum(within_left - between_left)
         return auc_dif
 
-    def cal_auc_permuted_vec(self):
-        auc_dif_list = [self.cal_auc_permuted(np.squeeze(self.permuted_data[x, :, :, :])) for x in np.arange(self.permuted_data.shape[0])]
-        auc_dif_vec = np.array(auc_dif_list)
-        return auc_dif_vec
+    def cal_auc_permuted_vec(self, name_permutation='grid_place'):
+        """
+        This function calculate the dif-auc over the permuted/sampled data
+        If name_permutation = 'grid_place' the permutation is over grid and place cells
+        if name_permutation = 'place' the place cells are sampled and the difference of place cells
+            auc is calculated
+        """
+        if name_permutation == 'grid_place':
+            auc_dif_list = [self.cal_auc_permuted(np.squeeze(self.permuted_gp_data[x, :, :, :])) for x in np.arange(self.permuted_gp_data.shape[0])]
+        if name_permutation == 'place':
+            auc_dif_list = [self.cal_auc_permuted(np.squeeze(self.permuted_p_data[x, :, :, :])) for x in
+                            np.arange(self.permuted_gp_data.shape[0])]
+        self.permuted_gp_auc = np.array(auc_dif_list)
 
-    def permute_data(self, num_samples=10):
+    def create_permuted_auc_dist(self, name_permutation='grid_place'):
+        """
+        This function calculates the permuted dif-auc distribution.
+        Parameters: name_permutation (str)
+            If name_permutation = 'grid_place' the permutation is over grid and place cells
+            if name_permutation = 'place' the place cells are sampled and the difference of place cells
+                auc is calculated
+
+        Return: the cdf
+        """
+        if name_permutation == 'grid_place':
+            hist, bin_edges = np.histogram(self.permuted_gp_auc, bins=100)
+        if name_permutation == 'place':
+            hist, bin_edges = np.histogram(self.permuted_p_auc, bins=100)
+        x = 0.5*(bin_edges[1:] + bin_edges[:-1])
+        prob = hist / np.sum(hist)
+        return x, np.cumsum(prob)
+
+    def permute_grid_place_data(self, num_samples=10):
+
+        """
+        Creates permuted grid and place cells array
+        Parameters: num_samples(int)
+        """
         array1 = self.place_cells
         array2 = self.grid_cells
         num_dims1 = array1.shape[1]
@@ -145,6 +191,6 @@ class Svd_AUC:
 
             # Concatenate the sampled dimensions from both arrays
             sampled_arr.append(np.concatenate((sampled_array1, sampled_array2), axis=1))
-            self.permuted_data = np.array(sampled_arr)
+            self.permuted_gp_data = np.array(sampled_arr)
 
 
