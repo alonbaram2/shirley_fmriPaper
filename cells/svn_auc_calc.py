@@ -5,13 +5,14 @@ from scipy import interpolate
 from scipy.ndimage import gaussian_filter
 
 class Svd_AUC:
-    def __init__(self, grid_cells=np.empty(2), place_cells=np.empty(2), permuted_gp_auc=np.empty(2)):
-        self.grid_cells = grid_cells[:, :40, :]
+    def __init__(self, grid_cells=np.empty(2), place_cells=np.empty(2), permuted_gp_auc=np.empty(2), sampled_p_auc=np.empty(2), n_grid=41):
+        self.num_real_place_cells = n_grid
+        self.grid_cells = grid_cells[:, :n_grid, :]
         self.place_cells = place_cells
         self.permuted_gp_data = np.empty(self.grid_cells.shape)
-        self.permuted_p_data = np.empty( self.grid_cells.shape)
+        self.sampled_p_data = np.empty(self.grid_cells.shape)
         self.permuted_gp_auc = permuted_gp_auc
-        self.permuted_p_auc = np.empty(2)
+        self.sampled_p_auc = sampled_p_auc
     """
     permuted_gp_data - permute grid and place cells
     permuted_p_data - sample place cells
@@ -88,10 +89,10 @@ class Svd_AUC:
         # Note that below I just selected the first 41 cells  to make grid and place cell area under the curve comparable (as this is the total number of grid cells but there are more place cells in the data).
         # This is not ideal, we should do some shuffling instead.
         #
-        if area_name=='grid':
+        if area_name == 'grid':
             trials = self.grid_cells
-        if area_name=='place':
-            trials = self.place_cells
+        if area_name == 'place':
+            trials = self.place_cells[:self.num_real_place_cells]
 
         t_u, t_v = self.svd_analysis(trials[0])  # SVD of the first trial
 
@@ -115,10 +116,11 @@ class Svd_AUC:
         This function calculate grid and place cells auc over the real data
         """
         between_left_grid, within_left_grid, between_right_grid, within_right_grid = self.place_grid_cells_SVDs('grid')
-        between_left_place, within_left_place, between_right_grid, within_right_place= self.place_grid_cells_SVDs('place')
+        between_left_place, within_left_place, between_right_grid, within_right_place = self.place_grid_cells_SVDs('place')
         auc_dif_grid = np.sum(within_left_grid - between_left_grid)
         auc_dif_place = np.sum(within_left_place - between_left_place)
         print(auc_dif_grid, auc_dif_place)
+        return auc_dif_grid, auc_dif_place
 
     def cal_auc_permuted(self, permuted_data):
         """
@@ -143,10 +145,10 @@ class Svd_AUC:
         """
         if name_permutation == 'grid_place':
             auc_dif_list = [self.cal_auc_permuted(np.squeeze(self.permuted_gp_data[x, :, :, :])) for x in np.arange(self.permuted_gp_data.shape[0])]
+            self.permuted_gp_auc = np.array(auc_dif_list)
         if name_permutation == 'place':
-            auc_dif_list = [self.cal_auc_permuted(np.squeeze(self.permuted_p_data[x, :, :, :])) for x in
-                            np.arange(self.permuted_gp_data.shape[0])]
-        self.permuted_gp_auc = np.array(auc_dif_list)
+            auc_dif_list = [self.cal_auc_permuted(np.squeeze(self.sampled_p_data[x, :, :, :])) for x in np.arange(self.sampled_p_data.shape[0])]
+            self.sampled_p_auc = np.array(auc_dif_list)
 
     def create_permuted_auc_dist(self, name_permutation='grid_place'):
         """
@@ -161,7 +163,7 @@ class Svd_AUC:
         if name_permutation == 'grid_place':
             hist, bin_edges = np.histogram(self.permuted_gp_auc, bins=100)
         if name_permutation == 'place':
-            hist, bin_edges = np.histogram(self.permuted_p_auc, bins=100)
+            hist, bin_edges = np.histogram(self.sampled_p_auc, bins=100)
         x = 0.5*(bin_edges[1:] + bin_edges[:-1])
         prob = hist / np.sum(hist)
         return x, np.cumsum(prob)
@@ -192,5 +194,14 @@ class Svd_AUC:
             # Concatenate the sampled dimensions from both arrays
             sampled_arr.append(np.concatenate((sampled_array1, sampled_array2), axis=1))
             self.permuted_gp_data = np.array(sampled_arr)
+
+    def sample_place_cells(self, n_cells=41, num_samples=10):
+        arr = self.place_cells
+        result = []
+        for _ in range(num_samples):
+            samples = np.random.choice(arr.shape[1], size=n_cells, replace=False)
+            result.append(arr[:, samples, :])
+        self.sampled_p_data = np.array(result)
+        print(f"sampled place cells data shape: {self.sampled_p_data.shape}")
 
 

@@ -101,7 +101,7 @@ def data_preprocessing(file, dictionary, color='green'):
     # This is not ideal, we should do some shuffling instead.
     #
 
-    extract_cells = load_cells[dictionary][:41]
+    extract_cells = load_cells[dictionary]
     print(extract_cells.shape)
     trials = [interpolate_and_filter_cells(extract_cells[:, i]) for i in range(5)]
 
@@ -124,30 +124,34 @@ def run():
 
     return place_cells, grid_cells
 
-def my_func(a):
-    print(a.shape)
 
 if __name__ == '__main__':
     place_cells, grid_cells = run()
     print(f"place cells array shape {place_cells.shape}")
     print(f"grid cells array shape {grid_cells.shape}")
-    num_permutation = 100
-    permuted_auc_file_name = 'grid_place_permute_auc' + str(num_permutation)
-    if os.path.exists(permuted_auc_file_name + '.npy'):
-        print('auc permutation file exists')
-        permuted_gp_auc = np.load('grid_place_permute_auc.npy')
-        Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells, permuted_gp_auc=permuted_gp_auc)
+    num_samples = 1500
+    sampled_auc_file_name = 'place_sampled_auc' + str(num_samples)
+    if os.path.exists(sampled_auc_file_name + '.npy'):
+        print('auc sampled file exists')
+        sampled_p_auc = np.load('place_sampled_auc' + str(num_samples) + '.npy')
+        Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells, sampled_p_auc=sampled_p_auc)
     else:
         Svd_AUC_obj = Svd_AUC(grid_cells=grid_cells, place_cells=place_cells)
-        Svd_AUC_obj.permute_grid_place_data(num_samples=num_permutation)
-        sampled_gp = Svd_AUC_obj.permuted_gp_data
-        np.save('grid_place_permuted' + str(num_permutation), sampled_gp)
-        print(sampled_gp.shape)
-        Svd_AUC_obj.cal_auc_permuted_vec(name_permutation='grid_place')
-        np.save(permuted_auc_file_name, Svd_AUC_obj.permuted_gp_auc)
-    # Svd_AUC_obj.cal_auc_real()
-    print(Svd_AUC_obj.permuted_gp_auc.shape)
-    x, cdf = Svd_AUC_obj.create_permuted_auc_dist()
+        Svd_AUC_obj.sample_place_cells(num_samples=num_samples)
+        sampled_p = Svd_AUC_obj.sampled_p_data
+        np.save('place_sampled' + str(num_samples), sampled_p)
+        print(sampled_p.shape)
+        Svd_AUC_obj.cal_auc_permuted_vec(name_permutation='place')
+        print(Svd_AUC_obj.sampled_p_auc.shape)
+        np.save(sampled_auc_file_name, Svd_AUC_obj.sampled_p_auc)
+    auc_dif_grid, auc_dif_place = Svd_AUC_obj.cal_auc_real()
+    print(Svd_AUC_obj.sampled_p_data.shape)
+    print(Svd_AUC_obj.sampled_p_auc.shape)
+    x, cdf = Svd_AUC_obj.create_permuted_auc_dist(name_permutation='place')
+    n_auc_dif_grid = np.sum(x <= auc_dif_grid) - 1
+    p_auc_dif_grid = cdf[n_auc_dif_grid]
+    print(f" x = {x[n_auc_dif_grid]}")
+    print(f" p_value = {p_auc_dif_grid}")
     plt.plot(x, cdf)
     plt.show()
 
