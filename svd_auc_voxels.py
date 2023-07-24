@@ -1,16 +1,18 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import scipy.io
 import os.path
+from scipy import stats
 
 DATA_PATH = 'voxels_data'
 class Svd_AUC_voxels:
-    def __init__(self, voxels_data=np.empty((28, 125, 4, 40))):
+    def __init__(self, voxels_data=np.empty((28, 100, 4, 40))):
         """
         voxels_data: array of blob voxels with dimensions [num_subjects  x num_voxels x runs x num_piles]
         """
-        self.voxels_data = np.random.rand(28, 125, 4, 40)#voxels_data
-        self.voxels_loo_average = np.random.rand(28, 125, 4, 40)
-        self.subject_svd_curve = np.empty((28, 4, 2, 125))  # num_subject x map's PC x map variance explained only for hex
+        self.voxels_data = voxels_data
+        self.voxels_loo_average = np.random.rand(28, 100, 4, 40)
+        self.subject_svd_curve = np.empty((28, 4, 2, 100))  # num_subject x map's PC x map variance explained only for hex
         self.subject_auc = np.empty((28, 4, 2)) #num_subject x map's PC x map variance explained only for hex
 
     def cal_loo_average(self):
@@ -23,7 +25,7 @@ class Svd_AUC_voxels:
             print(f"current indexes to average over: {mean_indexes}")
             self.voxels_loo_average[:, :, r, :] = np.mean(self.voxels_data[:, :, mean_indexes, :], axis=2)
 
-    def single_subject_map_eigenvector(self, subject_number=0, sub_voxels_data=np.empty((4, 125, 40)), sub_voxels_loo=np.empty((4, 125, 40))):
+    def single_subject_map_eigenvector(self, subject_number=0, sub_voxels_data=np.empty((100, 4, 40)), sub_voxels_loo=np.empty((4, 100, 40))):
 
         runs_vector = np.arange(4)
         for r in np.arange(4): #go over the runs
@@ -98,11 +100,43 @@ class Svd_AUC_voxels:
 
         return cum_var_x, cum_var_y
 
+    def plot_auc_curve(self):
+        averaged_projection = np.squeeze(np.mean(self.subject_svd_curve, axis=0))
+        within_map_projection = 0.5 * (averaged_projection[0, 0, :] + averaged_projection[1, 1, :])
+        grid_projection = 0.5 * (averaged_projection[0, 1, :] + averaged_projection[1, 0, :])
+        same_structure = 0.5*(within_map_projection + grid_projection)
+        diff_structure_projection = 0.25 * (averaged_projection[3, 1, :] + averaged_projection[3, 0, :] + \
+                                            averaged_projection[2, 1, :] + averaged_projection[2, 0, :])
+        plt.plot(within_map_projection)
+        plt.plot(grid_projection, ':')
+        plt.plot(diff_structure_projection, 'r')
+        plt.show()
+
+    def cal_main_effect(self):
+        same_map = 0.5*(self.subject_auc[:, 0, 0] + self.subject_auc[:, 1, 1])
+        same_structure_dif_map = 0.5*(self.subject_auc[:, 0, 1] + self.subject_auc[:, 1, 0])
+        same_structure = 0.5*(same_map + same_structure_dif_map)
+        dif_structure = 0.25*(self.subject_auc[:, 2, 1] + self.subject_auc[:, 2, 0] +\
+                              self.subject_auc[:, 2, 1] + self.subject_auc[:, 2, 0])
+        main_effect = np.squeeze(same_structure - dif_structure)
+        return main_effect
+
+
 
 print(os.getcwd())
 load_cells = scipy.io.loadmat(os.path.join(os.getcwd(), DATA_PATH, 'AUC_visualisation_EC.mat'))
-
-voxels_ana = Svd_AUC_voxels()
+voxels_data = load_cells['betasAllSubj']
+print(voxels_data.shape)
+voxels_data = np.transpose(voxels_data, (3, 2, 1, 0))
+print(voxels_data.shape)
+voxels_ana = Svd_AUC_voxels(voxels_data=voxels_data)
 voxels_ana.cal_loo_average()
 voxels_ana.run_subjects_auc_calculation()
-print(voxels_ana.subject_svd_curve.shape)
+main_effect = voxels_ana.cal_main_effect()
+print(main_effect.shape)
+print(np.mean(main_effect, axis=0))
+
+res = stats.ttest_1samp(main_effect, popmean=0, axis=0, nan_policy='propagate', alternative='greater')
+print(res.statistic, res.pvalue)
+
+voxels_ana.plot_auc_curve()
