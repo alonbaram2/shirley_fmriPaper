@@ -2,8 +2,8 @@ close all
 clear
 clc
 
-dataDir = '/Volumes/Scratch_abaram/shirley/alon/beh/training';
-% dataDir = '/vols/Scratch/abaram/shirley/alon/beh/training';
+% dataDir = '/Volumes/Scratch_abaram/shirley/alon/beh/training';
+dataDir = '/vols/Scratch/abaram/shirley/alon/beh/training';
 
 load(fullfile(dataDir,'allTrainingData.mat'),'D');
 
@@ -47,14 +47,20 @@ ylabel('% correct')
 
 
 % stats for whether answers oneach day were different from chanve
-[~, pMiddleHexDay1] = ttest(D.middle.hex_day1_ratioCorrect,0.5,'Tail','right')
-[~, pMiddleHexDay2] = ttest(D.middle.hex_day2_ratioCorrect,0.5,'Tail','right')
-[~, pMiddleClusDay3] = ttest(D.middle.clus_day3_ratioCorrect,0.5,'Tail','right')
-[~, pMiddleClusDay4] = ttest(D.middle.clus_day4_ratioCorrect,0.5,'Tail','right')
+[~, pMiddleHexDay1,~,s] = ttest(D.middle.hex_day1_ratioCorrect,0.5,'Tail','right');
+fprintf('Middle, day 1 p = %d, t = %d \n',pMiddleHexDay1,s.tstat)
+[~, pMiddleHexDay2,~,s] = ttest(D.middle.hex_day2_ratioCorrect,0.5,'Tail','right');
+fprintf('Middle, day 2 p = %d, t = %d \n',pMiddleHexDay2,s.tstat)
+[~, pMiddleClusDay3,~,s] = ttest(D.middle.clus_day3_ratioCorrect,0.5,'Tail','right');
+fprintf('Middle, day 3 p = %d, t = %d \n',pMiddleClusDay3,s.tstat)
+[~, pMiddleClusDay4,~,s] = ttest(D.middle.clus_day4_ratioCorrect,0.5,'Tail','right');
+fprintf('Middle, day 4 p = %d, t = %d \n',pMiddleClusDay4,s.tstat)
 
 % stats for improvement beween days
-[~, pMiddleHexDays] = ttest2(D.middle.hex_day2_ratioCorrect,D.middle.hex_day1_ratioCorrect,'Tail','right')
-[~, pMiddleClusDays] = ttest2(D.middle.clus_day4_ratioCorrect,D.middle.clus_day3_ratioCorrect,'Tail','right')
+[~, pMiddleHexDays,~,s] = ttest2(D.middle.hex_day2_ratioCorrect,D.middle.hex_day1_ratioCorrect,'Tail','right');
+fprintf('Middle, days 1-2 p = %d, t = %d \n',pMiddleHexDays,s.tstat)
+[~, pMiddleClusDays,~,s] = ttest2(D.middle.clus_day4_ratioCorrect,D.middle.clus_day3_ratioCorrect,'Tail','right');
+fprintf('Middle, days 3-4 p = %d, t = %d \n',pMiddleClusDays,s.tstat)
 
 %% piles task
 subplot(2,3,2)
@@ -92,14 +98,20 @@ set(gca,'FontSize',14,'XTick',1:4,'XTickLabels',labels,'XTickLabelRotation', 45)
 
 
 % stats for whether answers oneach day were different from chanve
-[~, pPilesHexDay1] = ttest(D.piles.hex_day1_ratioCorrect,0.5,'Tail','right')
-[~, pPilesHexDay2] = ttest(D.piles.hex_day2_ratioCorrect,0.5,'Tail','right')
-[~, pPilesClusDay3] = ttest(D.piles.clus_day3_ratioCorrect,0.5,'Tail','right')
-[~, pPilesClusDay4] = ttest(D.piles.clus_day4_ratioCorrect,0.5,'Tail','right')
+[~, pPilesHexDay1,~,s] = ttest(D.piles.hex_day1_ratioCorrect,0.333,'Tail','right');
+fprintf('Piles, day 1 p = %d, t = %d \n',pPilesHexDay1,s.tstat)
+[~, pPilesHexDay2,~,s] = ttest(D.piles.hex_day2_ratioCorrect,0.333,'Tail','right');
+fprintf('Piles, day 2 p = %d, t = %d \n',pPilesHexDay2,s.tstat)
+[~, pPilesClusDay3,~,s] = ttest(D.piles.clus_day3_ratioCorrect,0.333,'Tail','right');
+fprintf('Piles, day 3 p = %d, t = %d \n',pPilesClusDay3,s.tstat)
+[~, pPilesClusDay4,~,s] = ttest(D.piles.clus_day4_ratioCorrect,0.333,'Tail','right');
+fprintf('Piles, day 4 p = %d, t = %d \n',pPilesClusDay4,s.tstat)
 
 % stats for improvement beween days
-[~, pPilesHexDays] = ttest2(D.piles.hex_day2_ratioCorrect,D.piles.hex_day1_ratioCorrect,'Tail','right')
-[~, pPilesClusDays] = ttest2(D.piles.clus_day4_ratioCorrect,D.piles.clus_day3_ratioCorrect,'Tail','right')
+[~, pPilesHexDays,~,s] = ttest2(D.piles.hex_day2_ratioCorrect,D.piles.hex_day1_ratioCorrect,'Tail','right');
+fprintf('Piles, days 1-2 p = %d, t = %d \n',pPilesHexDays,s.tstat)
+[~, pPilesClusDays,~,s] = ttest2(D.piles.clus_day4_ratioCorrect,D.piles.clus_day3_ratioCorrect,'Tail','right');
+fprintf('Piles, days 3-4 p = %d, t = %d \n',pPilesClusDays,s.tstat)
 
 
 %% which is closer task
@@ -139,15 +151,20 @@ set(gca,'FontSize',14,'XTick',1:4,'XTickLabels',labels,'XTickLabelRotation', 45)
 
 
 % stats for whether answers oneach day were different from chanve
-[~, pCloserHexDay1] = ttest(D.closer.hex_day1_ratioCorrect,0.5,'Tail','right')
-[~, pCloserHexDay2] = ttest(D.closer.hex_day2_ratioCorrect,0.5,'Tail','right')
-[~, pCloserClusDay3] = ttest(D.closer.clus_day3_ratioCorrect,0.5,'Tail','right')
-[~, pCloserClusDay4] = ttest(D.closer.clus_day4_ratioCorrect,0.5,'Tail','right')
+[~, pCloserHexDay1,~,s] = ttest(D.closer.hex_day1_ratioCorrect,0.5,'Tail','right');
+fprintf('Closer, day 1 p = %d, t = %d \n',pCloserHexDay1,s.tstat)
+[~, pCloserHexDay2,~,s] = ttest(D.closer.hex_day2_ratioCorrect,0.5,'Tail','right');
+fprintf('Closer, day 2 p = %d, t = %d \n',pCloserHexDay2,s.tstat)
+[~, pCloserClusDay3,~,s] = ttest(D.closer.clus_day3_ratioCorrect,0.5,'Tail','right');
+fprintf('Closer, day 3 p = %d, t = %d \n',pCloserClusDay3,s.tstat)
+[~, pCloserClusDay4,~,s] = ttest(D.closer.clus_day4_ratioCorrect,0.5,'Tail','right');
+fprintf('Closer, day 4 p = %d, t = %d \n',pCloserClusDay4,s.tstat)
 
 % stats for improvement beween days
-[~, pCloserHexDays] = ttest2(D.closer.hex_day2_ratioCorrect,D.closer.hex_day1_ratioCorrect,'Tail','right')
-[~, pCloserClusDays] = ttest2(D.closer.clus_day4_ratioCorrect,D.closer.clus_day3_ratioCorrect,'Tail','right')
-
+[~, pCloserHexDays,~,s] = ttest2(D.closer.hex_day2_ratioCorrect,D.closer.hex_day1_ratioCorrect,'Tail','right');
+fprintf('Closer, days 1-2 p = %d, t = %d \n',pCloserHexDays,s.tstat)
+[~, pCloserClusDays,~,s] = ttest2(D.closer.clus_day4_ratioCorrect,D.closer.clus_day3_ratioCorrect,'Tail','right');
+fprintf('Closer, days 3-4 p = %d, t = %d \n',pCloserClusDays,s.tstat)
 
 %% navigation task
 
@@ -193,21 +210,11 @@ for iDist = 1:3
     labels = {'hex day1','hex day2','comm day3', 'comm day4'};
     set(gca,'FontSize',14,'XTick',1:4,'XTickLabels',labels,'XTickLabelRotation', 45)
     
-    % stats for whether answers oneach day were different from chanve
-    [~, pNavigDay1] = ttest(day1,0.5,'Tail','right');
-    sprintf('p initDist %d, day 1 = %d',iDist+1,pNavigDay1)
-    [~, pNavigDay2] = ttest(day2,0.5,'Tail','right');
-    sprintf('p initDist %d, day 2 = %d',iDist+1,pNavigDay2)
-    [~, pNavigDay3] = ttest(day3,0.5,'Tail','right');
-    sprintf('p initDist %d, day 3 = %d',iDist+1,pNavigDay3)
-    [~, pNavigDay4] = ttest(day4,0.5,'Tail','right');
-    sprintf('p initDist %d, day 4 = %d',iDist+1,pNavigDay4)
-    
     % stats for improvement beween days
-    [~, pNavigHexDays] = ttest2(day1,day2,'Tail','right');
-    [~, pNavigClusDays] = ttest2(day3,day4,'Tail','right');
-    sprintf('p initDist %d, diff days Hex = %d',iDist+1,pNavigHexDays)
-    sprintf('p initDist %d, diff days Comm = %d',iDist+1,pNavigClusDays)
+    [~, pNavigHexDays,~,s] = ttest2(day1,day2,'Tail','right');
+    fprintf('initDist %d, diff days Hex p = %d, t = %d \n',iDist+1,pNavigHexDays,s.tstat)
+    [~, pNavigClusDays,~,s] = ttest2(day3,day4,'Tail','right');
+    fprintf('initDist %d, diff days Comm p = %d, t = %d \n',iDist+1,pNavigClusDays,s.tstat)
 end
 
 

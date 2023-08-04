@@ -4,7 +4,7 @@ addpath(genpath(fullfile(root,'code')));
 subjects = cell(1,28);
 for iSub = 1:length(subjects)
     subjects{iSub}= ['sub-' num2str(iSub,'%02.f')];            
-%     runGlm1(root,subjects{iSub},1,1,0)    
+%     runGlm1(root,subjects{iSub},1,1,0,false)    
 %     createSubjMask_noNanOrInfAfterGlm(root,subjects{iSub},'glm1')
 %     createSl(root,subjects{iSub},'glm1',100)
 %     makeSubspaceGenerMatrix(root,sub,glm,'L100')

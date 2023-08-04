@@ -15,7 +15,7 @@ subspaceGener_dir = fullfile(root,'subspaceGener',sub);
 projMatFiles = cell(nFiles,1);
 for f=1:nFiles
     projMatFiles{f} = [subspaceGener_dir,'/smth',num2str(smoothKernel) 'mni_' matFname num2str(f),'.nii'];
-    V           = spm_vol(projMatFiles{f}); % heatder info      
+    V           = spm_vol(projMatFiles{f}); % header info      
     [projMat_currElement,~] = spm_read_vols(V,0);    
     projMat(:,:,:,f) = projMat_currElement;
 end
