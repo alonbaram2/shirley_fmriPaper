@@ -1,7 +1,9 @@
-clear all 
+clear  
 
 root = '/home/fs0/abaram/scratch/shirley/alon';
 addpath(genpath(fullfile(root,'code')));
+spm_path = '/home/fs0/abaram/scratch/MATLAB/spm12';
+addpath(genpath(spm_path));
 % subjects: sub-01 to sub-28
 
 normAndRunGlm = false;
@@ -10,8 +12,9 @@ subjects = cell(1,28);
 for iSub = 1:length(subjects)
     subjects{iSub}= ['sub-' num2str(iSub,'%02.f')];   
 end
-nVoxels = 117;
-maskName = ['EC_HexOnHexPeak_mask_' num2str(nVoxels) 'vox'];
+nVoxels = 106;
+% maskName = ['EC_HexOnHexPeak_mask_' num2str(nVoxels) 'vox'];
+maskName = ['EC2_' num2str(nVoxels) 'vox'];
 mask = fullfile(root,'masks','mni',[maskName '.nii']);
 
 betasAllSubj = nan(40,4,nVoxels,28); % nPilesInRun x nRuns x nVox in SL x nSubj

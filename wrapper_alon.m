@@ -1,5 +1,6 @@
 root = '/home/fs0/abaram/scratch/shirley/alon';
 addpath(genpath(fullfile(root,'code')));
+addpath(genpath('/home/fs0/abaram/scratch/MATLAB/spm12'))
 % subjects: sub-01 to sub-28
 subjects = cell(1,28);
 for iSub = 1:length(subjects)
