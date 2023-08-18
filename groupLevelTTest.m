@@ -24,8 +24,15 @@ end
 projHex = squeeze(projMat(:,:,:,1,:) + projMat(:,:,:,2,:) + projMat(:,:,:,5,:) + projMat(:,:,:,6,:));
 % projections of Hex on Cluster: 9: HlCl 10: HsCl 13: HlCs 14 HsCs
 projHexCl = squeeze(projMat(:,:,:,9,:) + projMat(:,:,:,10,:) + projMat(:,:,:,13,:) + projMat(:,:,:,14,:) );
+% projections of Cluster on Hex:
+projClHex = squeeze(projMat(:,:,:,3,:) + projMat(:,:,:,4,:) + projMat(:,:,:,7,:) + projMat(:,:,:,8,:) );
+% projections of Cluster on Cluster:
+projClCl = squeeze(projMat(:,:,:,11,:) + projMat(:,:,:,12,:) + projMat(:,:,:,15,:) + projMat(:,:,:,16,:) );
+% contrasts:
 projHex_contrast = projHex - projHexCl; 
-clear proHex proHexCl
+projHex_ClHex_contrast = projHex - projClHex; 
+projClCl_ClHex_contrast = projClCl - - projClHex; 
+clear proHex proHexCl projClHex projClCl
 
 %% Calculate stim set ID contrast
 % HlHl, HsHs, ClCl, CsCs
@@ -44,7 +51,27 @@ for iVox = 1:nVox
     tStats_linVox(iVox) = stats.tstat;
 end
 tStats = reshape(tStats_linVox,niiDims);
-save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_hexOnHexMinusClustOnHex.nii'))
+save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_hexOnHexMinusHexOnCluster.nii'))
+
+nVox = prod(niiDims);
+projHex_ClHex_contrast_linVox = reshape(projHex_ClHex_contrast,[nVox,length(subjects)]);
+tStats_linVox = zeros(nVox,1);
+for iVox = 1:nVox
+    [~,~,~,stats] = ttest(projHex_ClHex_contrast_linVox(iVox,:),0,'tail','right');
+    tStats_linVox(iVox) = stats.tstat;
+end
+tStats = reshape(tStats_linVox,niiDims);
+save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_hexOnHexMinusClusterOnHex.nii'))
+
+nVox = prod(niiDims);
+projClCl_ClHex_contrast_linVox = reshape(projClCl_ClHex_contrast,[nVox,length(subjects)]);
+tStats_linVox = zeros(nVox,1);
+for iVox = 1:nVox
+    [~,~,~,stats] = ttest(projClCl_ClHex_contrast_linVox(iVox,:),0,'tail','right');
+    tStats_linVox(iVox) = stats.tstat;
+end
+tStats = reshape(tStats_linVox,niiDims);
+save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_ClOnClMinusClusterOnHex.nii'))
 
 projStimSet_contrast_linVox = reshape(projStimSet_contrast,[nVox,length(subjects)]);
 tStats_linVox = zeros(nVox,1);
