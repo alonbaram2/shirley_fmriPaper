@@ -31,7 +31,7 @@ projClCl = squeeze(projMat(:,:,:,11,:) + projMat(:,:,:,12,:) + projMat(:,:,:,15,
 % contrasts:
 projHex_contrast = projHex - projHexCl; 
 projHex_ClHex_contrast = projHex - projClHex; 
-projClCl_ClHex_contrast = projClCl - - projClHex; 
+projClCl_ClHex_contrast = projClCl - projClHex; 
 clear proHex proHexCl projClHex projClCl
 
 %% Calculate stim set ID contrast
@@ -43,25 +43,25 @@ projStimSet_contrast = projSameStructSameStim - projSameStructDiffStim;
 clear projMat projSameStructSameStim projSameStructDiffStim
 
 %% stats
-nVox = prod(niiDims);
-projHex_contrast_linVox = reshape(projHex_contrast,[nVox,length(subjects)]);
-tStats_linVox = zeros(nVox,1);
-for iVox = 1:nVox
-    [~,~,~,stats] = ttest(projHex_contrast_linVox(iVox,:),0,'tail','right');
-    tStats_linVox(iVox) = stats.tstat;
-end
-tStats = reshape(tStats_linVox,niiDims);
-save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_hexOnHexMinusHexOnCluster.nii'))
-
-nVox = prod(niiDims);
-projHex_ClHex_contrast_linVox = reshape(projHex_ClHex_contrast,[nVox,length(subjects)]);
-tStats_linVox = zeros(nVox,1);
-for iVox = 1:nVox
-    [~,~,~,stats] = ttest(projHex_ClHex_contrast_linVox(iVox,:),0,'tail','right');
-    tStats_linVox(iVox) = stats.tstat;
-end
-tStats = reshape(tStats_linVox,niiDims);
-save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_hexOnHexMinusClusterOnHex.nii'))
+% nVox = prod(niiDims);
+% projHex_contrast_linVox = reshape(projHex_contrast,[nVox,length(subjects)]);
+% tStats_linVox = zeros(nVox,1);
+% for iVox = 1:nVox
+%     [~,~,~,stats] = ttest(projHex_contrast_linVox(iVox,:),0,'tail','right');
+%     tStats_linVox(iVox) = stats.tstat;
+% end
+% tStats = reshape(tStats_linVox,niiDims);
+% save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_hexOnHexMinusHexOnCluster.nii'))
+% 
+% nVox = prod(niiDims);
+% projHex_ClHex_contrast_linVox = reshape(projHex_ClHex_contrast,[nVox,length(subjects)]);
+% tStats_linVox = zeros(nVox,1);
+% for iVox = 1:nVox
+%     [~,~,~,stats] = ttest(projHex_ClHex_contrast_linVox(iVox,:),0,'tail','right');
+%     tStats_linVox(iVox) = stats.tstat;
+% end
+% tStats = reshape(tStats_linVox,niiDims);
+% save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_hexOnHexMinusClusterOnHex.nii'))
 
 nVox = prod(niiDims);
 projClCl_ClHex_contrast_linVox = reshape(projClCl_ClHex_contrast,[nVox,length(subjects)]);
@@ -73,12 +73,12 @@ end
 tStats = reshape(tStats_linVox,niiDims);
 save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_ClOnClMinusClusterOnHex.nii'))
 
-projStimSet_contrast_linVox = reshape(projStimSet_contrast,[nVox,length(subjects)]);
-tStats_linVox = zeros(nVox,1);
-for iVox = 1:nVox
-    [~,~,~,stats] = ttest(projStimSet_contrast_linVox(iVox,:),0,'tail','right');
-    tStats_linVox(iVox) = stats.tstat;
-end
-tStats = reshape(tStats_linVox,niiDims);
-save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_visual_sameStructSameStimMinusSameStructDiffStim.nii'))
+% projStimSet_contrast_linVox = reshape(projStimSet_contrast,[nVox,length(subjects)]);
+% tStats_linVox = zeros(nVox,1);
+% for iVox = 1:nVox
+%     [~,~,~,stats] = ttest(projStimSet_contrast_linVox(iVox,:),0,'tail','right');
+%     tStats_linVox(iVox) = stats.tstat;
+% end
+% tStats = reshape(tStats_linVox,niiDims);
+% save4Dnii(tStats,V,fullfile(root,'subspaceGener','groupStats','tStat_visual_sameStructSameStimMinusSameStructDiffStim.nii'))
 

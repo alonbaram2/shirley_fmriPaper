@@ -1,9 +1,12 @@
 clear
 close all
+clc
 
-root = '/home/fs0/abaram/scratch/shirley/alon';
-addpath(genpath(fullfile(root,'code')));
-spm_path = '/home/fs0/abaram/scratch/MATLAB/spm12';
+root = 'C:\Users\User\Documents\fMRI_EXP\Alon\';
+%addpath(genpath(fullfile(root,'code')));
+%spm_path = '/home/fs0/abaram/scratch/MATLAB/spm12';
+spm_path = 'C:\Program Files\MATLAB\R2023a\spm12';
+%addpath(genpath('C:\Program Files\MATLAB\R2023a\spm12'))
 addpath(genpath(spm_path));
 
 
