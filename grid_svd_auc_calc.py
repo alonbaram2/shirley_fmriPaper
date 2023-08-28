@@ -9,6 +9,8 @@ class Svd_AUC_Grid:
         self.grid_cells = grid_cells[:, :n_grid, :]
         self.within_left_grid = within_left_grid
         self.between_left_grid = between_left_grid
+        self.within_left_grid_plot = np.empty(2)
+        self.between_left_grid_plot = np.empty(2)
         self.permuted_g_auc_dif = permuted_g_auc_dif
         self.permuted_g_auc_between = permuted_g_auc_between
         self.num_permutation = n_permutation
@@ -120,7 +122,9 @@ class Svd_AUC_Grid:
 
         print(
             f"within_left_grid sum: {np.sum(within_left_grid / within_left_grid.shape[0])} and shape: {within_left_grid.shape} \
-              between_left_grid sum: {np.sum(between_left_grid / between_left_grid.shape[0])} and shape: {between_left_grid.shape}")
+              between_left_grid sum: {np.sum(between_left_grid / within_left_grid.shape[0])} and shape: {between_left_grid.shape}")
+        self.within_left_grid_plot = within_left_grid
+        self.between_left_grid_plot = between_left_grid
         self.within_left_grid = np.sum(within_left_grid) / within_left_grid.shape[0]
         self.between_left_grid = np.sum(between_left_grid) / within_left_grid.shape[0]
         auc_dif_grid = np.sum(within_left_grid - between_left_grid) / within_left_grid.shape[0]
@@ -136,8 +140,8 @@ class Svd_AUC_Grid:
         between_left, within_left, between_right, within_right = self.grid_cells_SVDs(
             'permuted')
         auc_dif = np.sum(within_left - between_left) / within_left.shape[0]
-        between_left_auc_dif = self.within_left_grid - np.sum(between_left) / within_left.shape[0]
-        return auc_dif, between_left_auc_dif
+        between_left_auc = np.sum(between_left) / within_left.shape[0]
+        return auc_dif, between_left_auc
 
 
     def cal_auc_permuted_vec(self):
@@ -153,7 +157,7 @@ class Svd_AUC_Grid:
         self.permuted_g_auc_between = auc_dif_arr[:, 1]
 
 
-    def create_permuted_auc_dist(self, name_permutation='between'):
+    def create_permuted_auc_dist(self, name_permutation='between', n_bin=100):
         """
         This function calculates the permuted dif-auc distribution.
         Parameters: name_permutation (str)
@@ -164,9 +168,11 @@ class Svd_AUC_Grid:
         Return: the cdf
         """
         if name_permutation == 'between':
-            hist, bin_edges = np.histogram(self.permuted_g_auc_between, bins=100)
+            hist, bin_edges = np.histogram(self.permuted_g_auc_between, bins=n_bin)
         elif name_permutation == 'dif':
-            hist, bin_edges = np.histogram(self.permuted_g_auc_dif, bins=100)
+            hist, bin_edges = np.histogram(self.permuted_g_auc_dif, bins=n_bin)
+        elif name_permutation == 'between_dif':
+            hist, bin_edges = np.histogram(self.within_left_grid - self.permuted_g_auc_between, bins=n_bin)
 
         x = 0.5 * (bin_edges[1:] + bin_edges[:-1])
         prob = hist / np.sum(hist)

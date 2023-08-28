@@ -129,7 +129,7 @@ def my_func(a):
 if __name__ == '__main__':
     place_cells, grid_cells = run()
     print(f"grid cells array shape {grid_cells.shape}")
-    num_permutation = 100
+    num_permutation = 1000
     permuted_auc_dif_file_name = 'cells/grid_permute_auc_dif' + str(num_permutation)
     permuted_auc_bet_file_name = 'cells/grid_permute_auc_between' + str(num_permutation)
     if os.path.exists(permuted_auc_dif_file_name + '.npy'):
@@ -145,12 +145,24 @@ if __name__ == '__main__':
     Svd_AUC_obj.cal_auc_real()
     print(Svd_AUC_obj.within_left_grid, Svd_AUC_obj.between_left_grid)
     print(Svd_AUC_obj.permuted_g_auc_dif.shape)
-    x_dif, cdf_dif = Svd_AUC_obj.create_permuted_auc_dist(name_permutation='dif')
-    x_between_dif, cdf_between_dif = Svd_AUC_obj.create_permuted_auc_dist(name_permutation='between')
+    x_dif, cdf_dif = Svd_AUC_obj.create_permuted_auc_dist(name_permutation='dif', n_bin=250)
+    x_between, cdf_between = Svd_AUC_obj.create_permuted_auc_dist(name_permutation='between', n_bin=250)
+    x_between_dif, cdf_between_dif = Svd_AUC_obj.create_permuted_auc_dist(name_permutation='between_dif', n_bin=200)
+    grid_auc_effect = Svd_AUC_obj.within_left_grid - Svd_AUC_obj.between_left_grid
+    n_auc_effect = np.sum(x_between_dif < grid_auc_effect)
+    p_val_auc_grid_dif = cdf_between_dif[n_auc_effect]
+    print(f"p_values: {p_val_auc_grid_dif}")
     plt.figure(1)
     plt.plot(x_dif, cdf_dif)
     plt.figure(2)
+    plt.plot(x_between, cdf_between)
+    plt.figure(3)
     plt.plot(x_between_dif, cdf_between_dif)
+    plt.figure(4)
+    plt.plot(Svd_AUC_obj.within_left_grid_plot, 'k', label='same arena')
+    plt.plot(Svd_AUC_obj.between_left_grid_plot, 'k-.', label='different arena')
+    plt.plot(np.arange(0, 1, 1/41), 'k:', label='random')
+    plt.legend()
     plt.show()
 
 
