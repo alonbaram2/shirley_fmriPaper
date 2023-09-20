@@ -2,6 +2,7 @@ clear
 close all
 clc
 
+exp_root = 'C:\Users\User\Documents\fMRI_EXP\';
 root = 'C:\Users\User\Documents\fMRI_EXP\Alon\';
 %addpath(genpath(fullfile(root,'code')));
 %spm_path = '/home/fs0/abaram/scratch/MATLAB/spm12';
@@ -19,8 +20,9 @@ plotSwarmChartFlag = false;
 
 % where to get the data from - only one should be true
 peakFlag = false;
-avgEffect0p01Mask = true;
+avgEffect0p01Mask = false;
 avgEffect0p05Mask = false;
+EHR_julich = true;
 
 if peakFlag
     titleStr = 'peak';
@@ -36,6 +38,9 @@ else
         titleStr = 'avg p<0.05';        
 %         mask = fullfile(root,'masks','mni','hexOnHexMinusClustOnHex_nPerm_10000_juelich_EC10_tfce_tstat_fwep_c1_mask_p05.nii');
         mask = fullfile(root,'masks','mni','hexOnHexMinusClustOnHex_nPerm_10000_juelich_EC10_vox_tstat_uncp_c1_mask_p05.nii');
+    elseif EHR_julich
+        titleStr = 'right EC masks';
+        mask = fullfile(exp_root,'ROImasks','Entorhinal_R_juelich.nii');
     end
     Vmask = spm_vol(mask);
     maskData = spm_read_vols(Vmask);
@@ -167,6 +172,18 @@ end
 
 projMatAllSubj = reshape(allData,[4,4,length(subjects)]);
 
+hex11_data = squeeze(projMatAllSubj(1, 1, :));
+cluster11_data = squeeze(projMatAllSubj(3, 3, :));
+
+figure(20)
+subplot(2,1,1)
+plot(hex11_data, '.')
+title('hex 11, mean ', mean(hex11_data))
+subplot(2,1,2)
+plot(cluster11_data, '.')
+title('cluster 11, mean ', mean(cluster11_data))
+
+[c, p ] = corrcoef(hex11_data, cluster11_data)
 figure
 hold on
 title([titleStr ', mean'])
@@ -200,5 +217,34 @@ xlabel('Data to calculate subspace')
 colorbar
 axis ij
 
+figure(10)
+subplot(1,2,1)
+projMatMean = squeeze(mean(projMatAllSubj,3));
+imagesc(projMatMean);
+title([titleStr ', mean'])
+colormap default
+labels = {'Hl','Hs','Cl','Cs'};
+xticklabels(labels);
+yticklabels(labels);
+xticks(1:4)
+yticks(1:4)
+ylabel('Data to project')
+xlabel('Data to calculate subspace')
+colorbar
+axis ij
 
-
+subplot(1,2,2)
+[~,~,~,S] = ttest(projMatAllSubj,50,'dim',3);
+projMatT = S.tstat;
+imagesc(projMatT);
+title([titleStr ', t-value'])
+colormap default
+labels = {'Hl','Hs','Cl','Cs'};
+xticklabels(labels);
+yticklabels(labels);
+xticks(1:4)
+yticks(1:4)
+ylabel('Data to project')
+xlabel('Data to calculate subspace')
+colorbar
+axis ij
