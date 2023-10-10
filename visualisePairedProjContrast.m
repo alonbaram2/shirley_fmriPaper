@@ -16,13 +16,13 @@ for iSub = 1:length(subjects)
     subjects{iSub}= ['sub-' num2str(iSub,'%02.f')];   
 end
 
-plotSwarmChartFlag = false; 
+plotSwarmChartFlag = true;%false; 
 
 % where to get the data from - only one should be true
 peakFlag = false;
 avgEffect0p01Mask = false;
-avgEffect0p05Mask = false;
-EHR_julich = true;
+avgEffect0p05Mask = true;%false;
+EHR_julich = false;%true;
 
 if peakFlag
     titleStr = 'peak';
@@ -105,13 +105,13 @@ for iSub=1:length(subjects)
     proHexCl_allData = allData(proHexClElem,:);
 end
 
-% proHex = mean(proHex_allData,1);
-% proHexCl = mean(proHexCl_allData,1);
-% for iSub=1:length(subjects)
-%     toSubtract = mean(proHex(iSub));
-%     proHex(iSub) = proHex(iSub) - toSubtract;
-%     proHexCl(iSub) = proHexCl(iSub) - toSubtract;
-% end
+proHex = mean(proHex_allData,1);
+proHexCl = mean(proHexCl_allData,1);
+for iSub=1:length(subjects)
+    toSubtract = mean(proHex(iSub));
+    proHex(iSub) = proHex(iSub) - toSubtract;
+    proHexCl(iSub) = proHexCl(iSub) - toSubtract;
+end
 
 % %% save to CSV file the DABEST likes
 % toCSV = cell(28*2,2);
