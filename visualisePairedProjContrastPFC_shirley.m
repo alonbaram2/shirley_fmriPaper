@@ -76,8 +76,8 @@ mean_matrixClHex12_suqres = mean(proClHex12_allData);
 [h_clcl_clhex, p_clcl_clhex, ~, stats] = ttest(mean_matrixClCl_suqres, mean_matrixClHex_suqres, 'Tail', 'right');
 [h_clcl_clhex_sym, p_clcl_clhex_sym] = ttest(mean_matrixClCl_suqres, mean_matrixClHex_suqres);
 
-[h_clcl_clhex11, p_clcl_clhex11] = ttest(mean_matrixClCl11_suqres, mean_matrixClHex11_suqres, 'Tail', 'right');
-[h_clcl_clhex12, p_clcl_clhex12] = ttest(mean_matrixClCl12_suqres, mean_matrixClHex12_suqres, 'Tail', 'right');
+[h_clcl_clhex11, p_clcl_clhex11, ~, statsC11] = ttest(mean_matrixClCl11_suqres, mean_matrixClHex11_suqres, 'Tail', 'right');
+[h_clcl_clhex12, p_clcl_clhex12, ~, statsC12] = ttest(mean_matrixClCl12_suqres, mean_matrixClHex12_suqres, 'Tail', 'right');
 
 cl_contrast = mean_matrixClCl_suqres - mean_matrixClHex_suqres;
 load(fullfile(dataDir,'pConCsCcor2.mat'))
