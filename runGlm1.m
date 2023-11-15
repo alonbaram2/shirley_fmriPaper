@@ -1,4 +1,7 @@
-function runGlm(root,sub,specify,estimate,contrasts)
+function runGlm1(root,sub,specify,estimate,contrasts,mniFlag)
+
+% mniFlag: true if running in MNI space. In this case currently only run
+% the GLM in the EC HexOnHex peak voxel blob. 
 
 pileDur = 1.4; % duration of pile (sequnce of images) presentation in seconds 
 nPiles = 10; % number of piles per map
@@ -9,10 +12,21 @@ nBlocks = 5; % number of blocks in each run. one block per map. Only 4 of these 
 nMaps = 5; % note that map 5 was actually a repitition of either map 1 or 2 alternately. these were excluded from further analyses. 
 nCatchQ = nCatch + 1; % number of questions after catch trial piles in each block, including the extra question at the end of the block
 
+
 preproc_path = [root '/preproc/' sub];
 
-glm = 'glm1'; % main glm for SVD analysis. 
-
+if mniFlag
+    maskPath = fullfile(root,'masks','mni');
+    mask = cellstr(spm_select('FPList', maskPath,'EC_HexOnHexPeak_mask_100vox.nii'));
+else
+    maskPath = fullfile(root,'masks',sub);
+    mask = cellstr(spm_select('FPList', maskPath,'brain.nii'));
+end
+if mniFlag
+    glm = 'glm1_mni'; % main glm for SVD analysis.
+else
+    glm = 'glm1'; % main glm for SVD analysis.
+end
 spm_path = '/home/fs0/abaram/scratch/MATLAB/spm12';
 addpath(spm_path)
 addpath(genpath(fullfile(root,'code')));
@@ -23,6 +37,7 @@ nRuns = length(runs);
 if specify
     
     clear matlabbatch
+
     glmResultsDir = fullfile(root,'glms',glm,sub);
     if ~exist(glmResultsDir)
         mkdir(glmResultsDir)
@@ -92,7 +107,11 @@ if specify
         matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t  = 16;
         matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t0 = 8;
         
-        allfiles = cellstr(spm_select('FPList', [preproc_path,'/',run,'/'], '^r_cleaned_smoothed_.*.nii$'));%not warp!
+        if mniFlag
+            allfiles = cellstr(spm_select('FPList', [preproc_path,'/',run,'/'], '^mni_r_cleaned_smoothed_.*.nii$'));%not warp!            
+        else
+            allfiles = cellstr(spm_select('FPList', [preproc_path,'/',run,'/'], '^r_cleaned_smoothed_.*.nii$'));%not warp!
+        end
         matlabbatch{1}.spm.stats.fmri_spec.sess(iRun).scans = allfiles; % select all scans - dummies are out during preprocess in fsl        
         
         % Calculate regressors of piles - these are the important
@@ -181,9 +200,8 @@ if specify
         matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0];
         matlabbatch{1}.spm.stats.fmri_spec.volt             = 1;
         matlabbatch{1}.spm.stats.fmri_spec.global           = 'None';
-        matlabbatch{1}.spm.stats.fmri_spec.mthresh          = 0.00001;%0.5;%0.1;% need to change it!!!
-        masksPath = fullfile(root,'masks',sub); 
-        matlabbatch{1}.spm.stats.fmri_spec.mask             = cellstr(spm_select('FPList', masksPath,['brain.nii']));%
+        matlabbatch{1}.spm.stats.fmri_spec.mthresh          = 0.00001;
+%         matlabbatch{1}.spm.stats.fmri_spec.mask             = mask;
           
         % cellstr(spm_select('FPList', [spm_path,'\tpm'],
         % 'mask_ICV.nii$'));%is it for normalized brain?
