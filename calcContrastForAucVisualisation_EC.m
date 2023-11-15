@@ -1,12 +1,13 @@
-clear
+clear all
 close all
+clc
 
-root = '/home/fs0/abaram/scratch/shirley/alon';
-addpath(genpath(fullfile(root,'code')));
-nVoxels = 100;
-% maskName = ['EC_HexOnHexPeak_mask_' num2str(nVoxels) 'vox'];
+root = 'C:\Users\User\Documents\fMRI_EXP\Alon\';
+%root = '/home/fs0/abaram/scratch/shirley/alon';
+%addpath(genpath(fullfile(root,'code')));
+nVoxels = 117;
+maskName = ['EC_HexOnHexPeak_mask_' num2str(nVoxels) 'vox'];
 % maskName = ['EC2_' num2str(nVoxels) 'vox'];
-maskName = ['LOC_visual_sameStructSameStimMinusSameStructDiffStim_mask_' num2str(nVoxels) 'vox'];
 
 load(fullfile(root,'subspaceGener',['AUC_visualisation_' maskName '.mat']))
 
@@ -181,8 +182,11 @@ cumVar_allSubs = squeeze(mean(cumVar_allSubs,3)); % average over runs)
 AUC = squeeze(sum(cumVar_allSubs,3));
 AUC_proHex = squeeze(AUC(1,1,:) + AUC(2,1,:) + AUC(1,2,:) + AUC(2,2,:));
 AUC_proHexCl = squeeze(AUC(1,3,:) + AUC(2,3,:) + AUC(1,4,:) + AUC(2,4,:));
+AUC_proClHex = squeeze(AUC(3,1,:) + AUC(3,2,:) + AUC(4,1,:) + AUC(4,2,:));
 AUC_contrast  = AUC_proHex - AUC_proHexCl;
-[h,p,~,stats] = ttest(AUC_contrast)
+AUC_contrast_onHex  = AUC_proHex - AUC_proClHex;
+[h,p,~,stats] = ttest(AUC_contrast, 0, 'Tail', 'right')
+[h_onHex,p_onHex,~,stats_onHex] = ttest(AUC_contrast_onHex, 0, 'Tail', 'right')
 
 proHex_toPlot = squeeze(cumVar_allSubs(1,1,:,:) +  cumVar_allSubs(2,1,:,:) + cumVar_allSubs(1,2,:,:) + cumVar_allSubs(2,2,:,:));
 proHexCl_toPlot = squeeze(cumVar_allSubs(1,3,:,:) +  cumVar_allSubs(2,3,:,:) + cumVar_allSubs(1,4,:,:) + cumVar_allSubs(2,4,:,:));
@@ -236,8 +240,11 @@ plot([-0.3,0.3],[0,0],'k--')
 proHex = squeeze(H_all(1,:) + H_all(2,:) + H_all(5,:) + H_all(6,:));
 % projections of Hex on Cluster: 9: HlCl 10: HsCl 13: HlCs 14 HsCs
 proHexCl = squeeze(H_all(9,:) + H_all(10,:) + H_all(13,:) + H_all(14,:));
+proClHex = squeeze(H_all(3,:) + H_all(4,:) + H_all(7,:) + H_all(8,:));
 proHex_contrast = proHex - proHexCl; 
-[h,p,~,stats] = ttest(proHex_contrast)
+proHex_contrast_onHex  = AUC_proHex - AUC_proClHex;
+[h,p,~,stats] = ttest(proHex_contrast,  0, 'Tail', 'right')
+[h_onHex,p_onHex,~,stats_onHex] = ttest(proHex_contrast_onHex,  0, 'Tail', 'right')
 
 %% save to CSV file the DABEST likes
 toCSV = cell(28*2,2);
