@@ -3,7 +3,7 @@ close all
 clc
 
 root = 'C:\Users\User\Documents\fMRI_EXP\Alon\';
-%addpath(genpath(fullfile(root,'code')));
+addpath(genpath(fullfile(root,'from_git','util')));
 addpath(genpath("C:\Users\User\OneDrive\Desktop\spm12"))
 %addpath(genpath('C:\Program Files\MATLAB\R2023a\spm12'))
 % subjects: sub-01 to sub-28
