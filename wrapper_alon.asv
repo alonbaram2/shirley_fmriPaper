@@ -16,8 +16,8 @@ for iSub = 1:length(subjects)
     makeSubspaceGenerMatrix_cor_cor(root,subjects{iSub},'glm1','L100')
     normAndSmoothSubspaceGenerMat_cor_cor(root,subjects{iSub},'L100')
 
-%     makePileSimilarityRDM(root,subjects{iSub},'glm1','L100')    
-%     normAndSmoothPileSimilarityRDM(root,subjects{iSub},'L100')
+    makePileSimilarityRDM(root,subjects{iSub},'glm1','L100')    
+    normAndSmoothPileSimilarityRDM(root,subjects{iSub},'L100')
     
 %     calcProjMatContrastsSubj_forPalm(root,subjects{iSub},'L100')
 end

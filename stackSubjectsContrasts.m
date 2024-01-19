@@ -12,7 +12,7 @@ for iAnalysis = 1:length(fname_con)
     fname_con{iAnalysis} = tmpFname(iAnalysis).name(1:end-4); % get rid of .nii suffix
 end
 
-outputDir = fullfile(root,'subspaceGener','groupStats','palm');
+outputDir = fullfile(root,'subspaceGener','groupStats','stackedInputs');
 mkdir(outputDir);
 
 for iAnalysis = 1:length(fname_con)

@@ -1,8 +1,8 @@
-function makeSubspaceGenerMatrix(root,sub,glm,slName)
+function makeSubspaceGenerMatrix_cor_cor(root,sub,glm,slName)
 
 glmDir = fullfile(root,'glms',glm,sub);
 preprocDir = fullfile(root,'preproc',sub);
-statsDir = fullfile(root,'subspaceGener',sub);
+statsDir = fullfile(root,'subspaceGener_cor_cor',sub);
 mkdir(statsDir);
 
 spm_path = '/home/fs0/abaram/scratch/MATLAB/spm12';
@@ -45,4 +45,4 @@ end
 load(fullfile(slDir,[slName,'.mat']));
 
 % run analysis. the details of the computation are in 
-runSearchlight_alon(L,inFiles,outFiles,@calcSubspaceGener,run,tempFilesDir,'optionalParams',{SPM});
+runSearchlight_alon(L,inFiles,outFiles,@calcSubspaceGener_cor_cor,run,tempFilesDir,'optionalParams',{SPM});

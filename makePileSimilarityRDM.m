@@ -1,8 +1,8 @@
-function makeSubspaceGenerMatrix(root,sub,glm,slName)
+function makePileSimilarityRDM(root,sub,glm,slName)
 
 glmDir = fullfile(root,'glms',glm,sub);
 preprocDir = fullfile(root,'preproc',sub);
-statsDir = fullfile(root,'subspaceGener',sub);
+statsDir = fullfile(root,'RSA_pileSim',sub);
 mkdir(statsDir);
 
 spm_path = '/home/fs0/abaram/scratch/MATLAB/spm12';
@@ -30,7 +30,7 @@ load(fullfile(glmDir,'SPM.mat'));
 % the names of the images created by the searchlight:  
 outFiles = cell(1,nFiles);
 for f=1:nFiles
-    outFiles{f} = [statsDir,'/',slName,'_projMat',num2str(f),'.nii']; % in subspace generalisation we first create a projection matrix - projecting data from one condition on eigenvectors from others.
+    outFiles{f} = [statsDir,'/',slName,'_pileSim',num2str(f),'.nii']; % in subspace generalisation we first create a projection matrix - projecting data from one condition on eigenvectors from others.
 end
 
 % loading images:
@@ -45,4 +45,4 @@ end
 load(fullfile(slDir,[slName,'.mat']));
 
 % run analysis. the details of the computation are in 
-runSearchlight_alon(L,inFiles,outFiles,@calcSubspaceGener,run,tempFilesDir,'optionalParams',{SPM});
+runSearchlight_alon(L,inFiles,outFiles,@calcPileSimilarity,run,tempFilesDir,'optionalParams',{SPM});
