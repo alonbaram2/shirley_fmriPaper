@@ -3,12 +3,9 @@ close all
 clc
 
 root = 'C:\Users\User\Documents\fMRI_EXP\Alon\';
-%root = '/home/fs0/abaram/scratch/shirley/alon';
-%addpath(genpath(fullfile(root,'code')));
 nVoxels = 117;
 maskName = ['EC_HexOnHexPeak_mask_' num2str(nVoxels) 'vox'];
-% maskName = ['EC2_' num2str(nVoxels) 'vox'];
-
+addpath(fullfile(root,'from_git','util'))
 load(fullfile(root,'subspaceGener',['AUC_visualisation_' maskName '.mat']))
 
 % subjects: sub-01 to sub-28
@@ -16,7 +13,6 @@ subjects = cell(1,28);
 for iSub = 1:length(subjects)
     subjects{iSub}= ['sub-' num2str(iSub,'%02.f')];
 end
-% nVoxels = size(betasToUse,3);
 
 % which betas: (for later analysis)
 nPiles= 10;

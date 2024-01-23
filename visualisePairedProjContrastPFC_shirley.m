@@ -9,6 +9,7 @@ dataDir = fullfile(root,"beh","training");
 addpath(genpath("C:\Users\User\OneDrive\Desktop\spm12"))
 
 subjects = cell(1,28);
+nSub = length(subjects);
 for iSub = 1:length(subjects)
     subjects{iSub}= ['sub-' num2str(iSub,'%02.f')];   
 end
@@ -163,3 +164,30 @@ ylabel('Data to project')
 xlabel('Data to calculate subspace')
 colorbar
 axis ij
+
+figure(11)
+subplot(1,2,1)
+projMatMean = squeeze(mean(projMatAllSubj2,3));
+imagesc(projMatMean);
+title([titleStr ', mean'])
+colormap default
+labels = {'Hl','Hs','Cl','Cs'};
+xticklabels(labels);
+yticklabels(labels);
+xticks(1:4)
+yticks(1:4)
+ylabel('Data to project')
+xlabel('Data to calculate subspace')
+colorbar
+axis ij
+
+subplot(1,2,2)
+scatter(zeros(nSub,1)+0.01*randn(nSub,1),cl_contrast,7,'filled','b','MarkerFaceAlpha',1)
+hold on
+plot(0,mean(cl_contrast),'*r')
+hold on
+errorbar(0,mean(cl_contrast),std(cl_contrast)/sqrt(nSub),'r')
+xlim([-0.1,0.1])
+hold on
+plot([-0.1,0.1],[0,0],'k--')
+xticklabels({})
