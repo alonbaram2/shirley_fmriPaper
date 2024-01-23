@@ -5,7 +5,7 @@ clc
 root = 'C:\Users\User\Documents\fMRI_EXP\Alon\';
 nVoxels = 117;
 maskName = ['EC_HexOnHexPeak_mask_' num2str(nVoxels) 'vox'];
-
+addpath(fullfile(root,'from_git','util'))
 load(fullfile(root,'subspaceGener',['AUC_visualisation_' maskName '.mat']))
 
 % subjects: sub-01 to sub-28

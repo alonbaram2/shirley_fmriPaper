@@ -59,54 +59,38 @@ if flagCal==1 % if betas are OK calculate, otherwise put -10000 at that voxel
         
         %hex 1
         hex1avLoo = squeeze(betaMeanLOO(1:10,r,:));
-        hex1avLoo = hex1avLoo - repmat(mean(hex1avLoo),nPiles,1); % substract the mean over condition
-        [U1,S1,~] = svd(hex1avLoo'*hex1avLoo,'econ');%
-        Cor_hex1_clean = U1(:, 1:nPiles) * S1(1:nPiles, 1:nPiles) * U1(:, 1:nPiles)';
+        Cor_hex1_clean = corr(hex1avLoo, hex1avLoo);
         
         % hex 2
         hex2avLoo = squeeze(betaMeanLOO(11:20,r,:));
-        hex2avLoo = hex2avLoo - repmat(mean(hex2avLoo),nPiles,1);
-        [U2,S2,~] = svd(hex2avLoo'*hex2avLoo,'econ');%
-        Cor_hex2_clean = U2(:, 1:nPiles) * S2(1:nPiles, 1:nPiles) * U2(:, 1:nPiles)';
+        Cor_hex2_clean = corr(hex2avLoo, hex2avLoo);
 
         % cluster 1:
         clus1avLoo = squeeze(betaMeanLOO(21:30,r,:));
-        clus1avLoo = clus1avLoo - repmat(mean(clus1avLoo),nPiles,1);
-        [U3,S3,~] = svd(clus1avLoo'*clus1avLoo,'econ');%
-        Cor_cluster1_clean = U3(:, 1:nPiles) * S3(1:nPiles, 1:nPiles) * U3(:, 1:nPiles)';
+        Cor_cluster1_clean = corr(clus1avLoo, clus1avLoo);
 
         % cluster 2:
         clus2avLoo = squeeze(betaMeanLOO(31:40,r,:));
-        clus2avLoo = clus2avLoo - repmat(mean(clus2avLoo),nPiles,1);
-        [U4,S4,~] = svd(clus2avLoo'*clus2avLoo,'econ');%
-        Cor_cluster2_clean = U4(:, 1:nPiles) * S4(1:nPiles, 1:nPiles) * U4(:, 1:nPiles)';
+        Cor_cluster2_clean = corr(clus2avLoo, clus2avLoo);
 
         % Calculate SVD on the data from the run itself. 
         % Sr are the scalings (eigenvalues)
         
         %hex 1
         hex1run = squeeze(betasToUse(1:10,r,:));
-        hex1run =  hex1run - repmat(mean(hex1run,1),nPiles,1);
-        [U1r,S1r,~] = svd(hex1run'*hex1run,'econ');%
-        Cor_hex1run_clean = U1r(:, 1:nPiles) * S1r(1:nPiles, 1:nPiles) * U1r(:, 1:nPiles)';
+        Cor_hex1run_clean = corr(hex1run, hex1run);
 
         %hex 2
         hex2run = squeeze(betasToUse(11:20,r,:));
-        hex2run = hex2run - repmat(mean(hex2run,1),nPiles,1);
-        [U2r,S2r,~] = svd(hex2run'*hex2run,'econ');
-        Cor_hex2run_clean = U2r(:, 1:nPiles) * S2r(1:nPiles, 1:nPiles) * U2r(:, 1:nPiles)';
+        Cor_hex2run_clean = corr(hex2run, hex2run);
 
         %cluster 1:
         clus1run = squeeze(betasToUse(21:30,r,:));
-        clus1run = clus1run - repmat(mean(clus1run),nPiles,1);
-        [U3r,S3r,~] = svd(clus1run'*clus1run,'econ');
-        Cor_cluster1run_clean = U3r(:, 1:nPiles) * S3r(1:nPiles, 1:nPiles) * U3r(:, 1:nPiles)';
+        Cor_cluster1run_clean = corr(clus1run, clus1run);
 
         %cluster 2:
         clus2run = squeeze(betasToUse(31:40,r,:));
-        clus2run = clus2run - repmat(mean(clus2run,1),nPiles,1);
-        [U4r,S4r,~] = svd(clus2run'*clus2run,'econ');
-        Cor_cluster2run_clean = U4r(:, 1:nPiles) * S4r(1:nPiles, 1:nPiles) * U4r(:, 1:nPiles)';
+        Cor_cluster2run_clean = corr(clus2run, clus2run);
 
         %correlation of correlations matrices:
         % On hex 1:
